@@ -72,7 +72,19 @@ public class WorkOrderSpeechTests : AcceptanceTestBase
         order = await ClickWorkOrderNumberFromSearchPage(order);
 
         order = await CompleteExistingWorkOrder(order);
-        order = await ClickWorkOrderNumberFromSearchPage(order);
+
+        // The creator now has a Reassign command on completed work orders,
+        // so switch to a non-creator user to get a read-only view.
+        var viewer = CreateTestUser(TestTag);
+        CurrentUser = viewer;
+        await Page.GotoAsync("/login");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+        await Select(nameof(Login.Elements.User), viewer.UserName);
+        await Click(nameof(Login.Elements.LoginButton));
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
+
+        await Page.GotoAsync($"/workorder/manage/{order.Number}");
+        await Page.WaitForLoadStateAsync(LoadState.NetworkIdle);
 
         await Expect(Page.GetByTestId(nameof(WorkOrderManage.Elements.ReadOnlyMessage))).ToBeVisibleAsync();
         await Expect(Page.GetByTestId(nameof(WorkOrderManage.Elements.SpeakTitle))).ToBeVisibleAsync();
