@@ -12,8 +12,9 @@ public class WorkOrderReformatAgent(
     ILogger<WorkOrderReformatAgent> logger)
 {
     /// <summary>
-    ///     Reformats a work order's description for grammar and punctuation,
-    ///     and ensures the title starts with a capital letter.
+    ///     Reformats a work order's title using proper title-case,
+    ///     corrects the description for grammar and punctuation,
+    ///     and translates the description into the assignee's preferred language when an assignee is set.
     ///     Returns the updated title and description, or null if no changes are needed.
     /// </summary>
     public async Task<ReformatResult?> ReformatWorkOrderAsync(WorkOrder workOrder)
@@ -22,25 +23,37 @@ public class WorkOrderReformatAgent(
         {
             var chatClient = await chatClientFactory.GetChatClient();
 
-            var systemPrompt = """
-                               You are an AI agent responsible for reformatting work order fields.
-                               You will receive a work order title and description.
+            var preferredLanguage = workOrder.Assignee?.PreferredLanguage;
 
-                               Your tasks:
-                               1. Correct the description for grammar and punctuation. Do not change the meaning.
-                               2. Ensure the title starts with a capital letter. Do not change anything else about the title.
+            var translationInstruction = preferredLanguage != null
+                ? $"Correct the description for grammar and punctuation, then translate it into {preferredLanguage}. Do not change the meaning."
+                : "Correct the description for grammar and punctuation. Do not change the meaning.";
 
-                               If no changes are needed, respond with exactly: NO_CHANGES
+            var systemPrompt = $"""
+                                You are an AI agent responsible for reformatting work order fields.
+                                You will receive a work order title and description.
 
-                               Otherwise respond in this exact format (two lines only):
-                               TITLE: <corrected title>
-                               DESCRIPTION: <corrected description>
-                               """;
+                                Your tasks:
+                                1. {translationInstruction}
+                                2. Format the title using proper title-case (capitalize the first letter of each significant word). Do not change the meaning.
 
-            var workOrderInfo = $"""
-                                 Title: {workOrder.Title}
-                                 Description: {workOrder.Description}
-                                 """;
+                                If no changes are needed, respond with exactly: NO_CHANGES
+
+                                Otherwise respond in this exact format (two lines only):
+                                TITLE: <corrected title>
+                                DESCRIPTION: <corrected description>
+                                """;
+
+            var workOrderInfo = preferredLanguage != null
+                ? $"""
+                    Title: {workOrder.Title}
+                    Description: {workOrder.Description}
+                    Preferred Language: {preferredLanguage}
+                    """
+                : $"""
+                    Title: {workOrder.Title}
+                    Description: {workOrder.Description}
+                    """;
 
             var messages = new List<ChatMessage>
             {
