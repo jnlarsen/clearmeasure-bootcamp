@@ -198,7 +198,7 @@ public abstract class AcceptanceTestBase
     /// <summary>
     /// Creates a unique test user for this test instance to enable parallel test execution.
     /// </summary>
-    protected static Employee CreateTestUser(string testTag)
+    private static Employee CreateTestUser(string testTag)
     {
         using var context = TestHost.NewDbContext();
         var employee = TestHost.Faker<Employee>();
