@@ -1,4 +1,5 @@
 using ClearMeasure.Bootcamp.Core.Model;
+using Shouldly;
 
 namespace ClearMeasure.Bootcamp.UnitTests.Core.Model;
 
@@ -46,7 +47,7 @@ public class WorkOrderTests
         workOrder.Assignee = assignee;
 
         Assert.That(workOrder.Id, Is.EqualTo(guid));
-        Assert.That(workOrder.Title, Is.EqualTo("Title"));
+        Assert.That(workOrder.Title, Is.EqualTo("TITLE"));
         Assert.That(workOrder.Description, Is.EqualTo("Description"));
         Assert.That(workOrder.Status, Is.EqualTo(WorkOrderStatus.Complete));
         Assert.That(workOrder.Number, Is.EqualTo("Number"));
@@ -79,5 +80,29 @@ public class WorkOrderTests
         order.Status = WorkOrderStatus.Draft;
         order.ChangeStatus(WorkOrderStatus.Assigned);
         Assert.That(order.Status, Is.EqualTo(WorkOrderStatus.Assigned));
+    }
+
+    [Test]
+    public void Title_WhenSetWithMixedCase_ReturnsUppercase()
+    {
+        var workOrder = new WorkOrder();
+        workOrder.Title = "Fix Broken Window";
+        workOrder.Title.ShouldBe("FIX BROKEN WINDOW");
+    }
+
+    [Test]
+    public void Title_WhenSetWithNull_ReturnsNull()
+    {
+        var workOrder = new WorkOrder();
+        workOrder.Title = null;
+        workOrder.Title.ShouldBeNull();
+    }
+
+    [Test]
+    public void Title_WhenSetWithEmptyString_ReturnsEmptyString()
+    {
+        var workOrder = new WorkOrder();
+        workOrder.Title = "";
+        workOrder.Title.ShouldBe("");
     }
 }
