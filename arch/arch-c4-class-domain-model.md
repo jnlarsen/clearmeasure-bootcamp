@@ -16,6 +16,7 @@ C4Component
   Component(draftToAssigned, "DraftToAssignedCommand", "State command", "Draft -> Assigned", "tabler:user-check")
   Component(assignedToInProgress, "AssignedToInProgressCommand", "State command", "Assigned -> InProgress", "tabler:player-play")
   Component(inProgressToComplete, "InProgressToCompleteCommand", "State command", "InProgress -> Complete", "tabler:circle-check")
+  Component(completeToInProgress, "CompleteToInProgressCommand", "State command", "Complete -> InProgress (Reopen)", "tabler:arrow-back-up")
   Component(stateCommandResult, "StateCommandResult", "Record", "Result of a state command execution", "tabler:clipboard-check")
 
   Rel(workOrder, entityBase, "inherits")
@@ -31,6 +32,7 @@ C4Component
   Rel(draftToAssigned, stateCommandBase, "extends")
   Rel(assignedToInProgress, stateCommandBase, "extends")
   Rel(inProgressToComplete, stateCommandBase, "extends")
+  Rel(completeToInProgress, stateCommandBase, "extends")
   Rel(stateCommandBase, workOrder, "operates on")
   Rel(stateCommandBase, employee, "CurrentUser")
   Rel(stateCommandBase, workOrderStatus, "begin/end status")

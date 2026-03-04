@@ -104,6 +104,10 @@ class InProgressToCompleteCommand <<record>> {
   +Execute(context : StateCommandContext) : void
 }
 
+class CompleteToInProgressCommand <<record>> {
+  +Execute(context : StateCommandContext) : void
+}
+
 class StateCommandResult <<record>> {
   +WorkOrder : WorkOrder
   +TransitionVerbPresentTense : string
@@ -120,6 +124,7 @@ SaveDraftCommand --|> StateCommandBase
 DraftToAssignedCommand --|> StateCommandBase
 AssignedToInProgressCommand --|> StateCommandBase
 InProgressToCompleteCommand --|> StateCommandBase
+CompleteToInProgressCommand --|> StateCommandBase
 
 ' Associations
 WorkOrder "1" *-- "1" WorkOrderStatus : status
